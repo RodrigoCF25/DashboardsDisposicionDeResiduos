@@ -1,0 +1,29 @@
+.dashboard{
+    width: 100vw;
+    height: auto;
+    padding: 24px;
+    background: #F8F9FF;
+}
+
+.cards{
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    width: 100%;
+    height: 100%;
+    margin-top: 16px;
+}
+
+.charts{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-top: 16px;
+}
+
+
+@media (max-width : 768px){
+    .charts{
+        grid-template-columns: 1fr;
+    }
+}

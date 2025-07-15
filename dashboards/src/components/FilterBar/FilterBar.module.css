@@ -1,0 +1,62 @@
+.filterbar {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  gap: 1rem;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+
+  border-radius: 1rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(6px);
+
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.filterbar__item {
+  position: relative;
+  width: 200px;
+}
+
+.filterbar__item select {
+  width: 100%;
+  background-color: var(--bg-blue-primary); /* Azul suave con menos opacidad */
+  color: #ffffff;
+
+  padding: 8px 36px 8px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+
+  font-size: 12px;
+  font-weight: 600;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  transition: border 0.2s, background 0.2s, box-shadow 0.2s;
+}
+
+.filterbar__item select:hover {
+  background-color: var(--bg-blue-hover);
+  border-color: var(--border-blue-hover);
+}
+
+
+.filterbar__item select:focus {
+  border-color: var(--bg-blue-focus); 
+  box-shadow: 0 0 0 2px var(--shadow-blue-focus);
+}
+
+.filterbar__item::after {
+  content: '▾';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: white;
+  pointer-events: none;
+  font-size: 20px; /* Tamaño más grande */
+  z-index: 1;
+}

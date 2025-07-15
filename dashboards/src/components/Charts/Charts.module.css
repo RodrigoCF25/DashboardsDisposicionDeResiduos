@@ -1,0 +1,22 @@
+.recharts_wrapper {
+    width:100%;
+    height:100%;
+    user-select: none;
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10+ */
+    font-size: 14px;
+}
+
+.recharts_wrapper *:focus {
+  outline: none;
+}
+
+
+.recharts-wrapper *:focus:not(:focus-visible) {
+  outline: none;
+}
+
+
+.title{
+    font-size: 20px;
+}

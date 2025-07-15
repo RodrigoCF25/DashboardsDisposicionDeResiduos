@@ -1,0 +1,26 @@
+.card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex: 1 1 200px;
+    background: var(--gradient-main);
+    color: #ffffff;
+    padding: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  
+}
+
+.title {
+    font-size: var(--font-2xl);
+    font-weight: bold;
+    color: black;
+}
+
+.description {
+    font-size: var(--font-md);
+    font-weight: var(--font-weight-semibold);
+    color: black;
+}
