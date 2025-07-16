@@ -1,10 +1,20 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Card } from "../components/Card/Card";
 import { FilterBar } from "../components/FilterBar/FilterBar";
 import { rellenoData } from "../data/rellenoData";
 import { PieChart } from "../components/Charts/PieChart/PieChart";
 import { BarChart } from "../components/Charts/BarChart/BarChart";
 import styles from "./Dashboard.module.css"
+
+/*
+* Toneladas recibidas
+* Ingreso por disposición
+* Top 3 tipo de residuo
+* Top 3 clientes
+* Duración promedio de disposición
+* Kg promedio por entrega
+* Promedio de tiradas por cliente
+*/
 
 
 function RellenoDashboard() {
@@ -19,33 +29,41 @@ function RellenoDashboard() {
     });
   }, [client, month]);
 
-  const totalToneladas = useMemo(() => {
-    return (filteredRellenoData.reduce((sum, d) => sum + d.kg, 0) / 1000).toFixed(2);
-  }, [filteredRellenoData]);
+    const {
+    totalToneladas,
+    totalIngreso,
+    duracionPromedio,
+    kgPromedioPorEntrega,
+    promedioTiradasPorCliente
+    } = useMemo(() => {
+    let sumaKg = 0;
+    let sumaIngreso = 0;
+    let sumaDuracion = 0;
+    let sumaTiradas = 0;
+    const clientesUnicos = new Set();
 
-  const totalIngreso = useMemo(() => {
-    return filteredRellenoData.reduce((sum, d) => sum + d.ingreso, 0).toFixed(2);
-  }, [filteredRellenoData]);
+    for (const d of filteredRellenoData) {
+        sumaKg += d.kg ?? 0;
+        sumaIngreso += d.ingreso ?? 0;
+        sumaDuracion += d.duracion_min ?? 0;
+        sumaTiradas += d.tiradas ?? 0;
+        if (d.cliente) clientesUnicos.add(d.cliente);
+    }
 
-  const duracionPromedio = useMemo(() => {
-    const totalDuracion = filteredRellenoData.reduce((sum, d) => sum + d.duracion_min, 0);
-    const totalTiradas = filteredRellenoData.reduce((sum, d) => sum + d.tiradas, 0);
-    if (totalTiradas === 0) return 0;
-    return (totalDuracion / totalTiradas).toFixed(2);
-  }, [filteredRellenoData]);
+    const totalToneladas = (sumaKg / 1000);
+    const totalIngreso = sumaIngreso;
+    const duracionPromedio = sumaTiradas === 0 ? 0.0 : (sumaDuracion / sumaTiradas);
+    const kgPromedioPorEntrega = sumaTiradas === 0 ? 0.0 : (sumaKg / sumaTiradas);
+    const promedioTiradasPorCliente = clientesUnicos.size === 0 ? 0.0 : (sumaTiradas / clientesUnicos.size);
 
-  const kgPromedioPorEntrega = useMemo(() => {
-    const totalKg = filteredRellenoData.reduce((sum, d) => sum + d.kg, 0);
-    const totalTiradas = filteredRellenoData.reduce((sum, d) => sum + d.tiradas, 0);
-    if (totalTiradas === 0) return 0;
-    return (totalKg / totalTiradas).toFixed(2);
-  }, [filteredRellenoData]);
-
-  const promedioTiradasPorCliente = useMemo(() => {
-    const totalTiradas = filteredRellenoData.reduce((sum, d) => sum + d.tiradas, 0);
-    const clientesUnicos = new Set(filteredRellenoData.map((d) => d.cliente)).size;
-    return clientesUnicos === 0 ? 0 : (totalTiradas / clientesUnicos).toFixed(2);
-  }, [filteredRellenoData]);
+    return {
+        totalToneladas,
+        totalIngreso,
+        duracionPromedio,
+        kgPromedioPorEntrega,
+        promedioTiradasPorCliente
+    };
+    }, [filteredRellenoData]);
 
   return (
     <>
@@ -59,194 +77,22 @@ function RellenoDashboard() {
                 className={styles.cards}
                 >
                 {/* Toneladas recibidas */}
-                <Card value={totalToneladas } description={"toneladas de basura"} />
+                <Card value={totalToneladas.toFixed(2)} description={"toneladas recibidas"} />
                 {/* Ingreso por disposición */}
-                <Card value={`$${totalIngreso}`} description={"ingreso por disposición"} />
+                <Card value={`$${totalIngreso.toFixed(2)}`} description={"ingreso por disposición"} />
                 {/* Duración promedio de disposición */} 
-                <Card value={`${duracionPromedio} min`} description={"duración promedio por disposición"} />
+                <Card value={`${duracionPromedio.toFixed(2)} min`} description={"duración promedio por disposición"} />
                 {/* Kg promedio por entrega */}
-                <Card value={`${kgPromedioPorEntrega} kg`} description={"promedio por entrega"} />
+                <Card value={`${kgPromedioPorEntrega.toFixed(2)} kg`} description={"promedio por entrega"} />
                 {/* Promedio de tiradas por cliente */}
-                <Card value={promedioTiradasPorCliente} description={"promedio de tiradas por cliente"} />
+                <Card value={promedioTiradasPorCliente.toFixed(2)} description={"promedio de tiradas por cliente"} />
                 </div>
 
                 <div
                 className={styles.charts}
                 >
-                {/* Distribución de kg por cliente */}
-                {!client && (
-                    <section aria-labelledby="kg-distribucion-cliente">
-                    <PieChart
-                        id="kg-distribucion-cliente"
-                        title="Distribución de kg por cliente"
-                        data={filteredRellenoData}
-                        groupBy="cliente"
-                        metricField="kg"
-                    />
-                    </section>
-                )}
 
-                <section aria-labelledby="kg-distribucion-residuo">
-                    <PieChart
-                    id="kg-distribucion-residuo"
-                    title="Distribución de kg por tipo de residuo"
-                    data={filteredRellenoData}
-                    groupBy="tipo_residuo"
-                    metricField="kg"
-                    />
-                </section>
-
-                {/* Toneladas recibidas en el tiempo o por cliente */}
-                {!client && !month && (
-                    <section aria-labelledby="kg-recibidos-mes">
-                    <BarChart
-                        id="kg-recibidos-mes"
-                        title="Kilogramos dispuestos por mes"
-                        data={filteredRellenoData}
-                        xField="mes"
-                        yField="kg"
-                        yLabel="Kg recibidas"
-                    />
-                    </section>
-                )}
-                {client && !month && (
-                    <section aria-labelledby="kg-recibidos-mes-cliente">
-                    <BarChart
-                        id="kg-recibidos-mes-cliente"
-                        title="Kilogramos dispuestos por mes"
-                        data={filteredRellenoData}
-                        xField="mes"
-                        yField="kg"
-                        yLabel="Kg recibidos"
-                    />
-                    </section>
-                )}
-                {!client && month && (
-                    <section aria-labelledby="kg-recibidos-cliente-mes">
-                    <BarChart
-                        id="kg-recibidos-cliente-mes"
-                        title={`Kilogramos dispuestos`}
-                        data={filteredRellenoData}
-                        xField="cliente"
-                        yField="kg"
-                        yLabel="Kg recibidos"
-                    />
-                    </section>
-                )}
-
-                {/* Duración promedio de disposición */}
-                {!client && !month && (
-                    <section aria-labelledby="duracion-promedio-mes">
-                    <BarChart
-                        id="duracion-promedio-mes"
-                        title="Duración promedio (min) de disposición por mes"
-                        data={filteredRellenoData}
-                        xField="mes"
-                        yField="duracion_min"
-                        yLabel="Duración promedio (min)"
-                        aggregation="average"
-                    />
-                    </section>
-                )}
-                {client && !month && (
-                    <section aria-labelledby="duracion-promedio-mes-cliente">
-                    <BarChart
-                        id="duracion-promedio-mes-cliente"
-                        title="Duración promedio (min) de disposición por mes"
-                        data={filteredRellenoData}
-                        xField="mes"
-                        yField="duracion_min"
-                        yLabel="Duración promedio (min)"
-                    />
-                    </section>
-                )}
-                {!client && month && (
-                    <section aria-labelledby="duracion-promedio-cliente-mes">
-                    <BarChart
-                        id="duracion-promedio-cliente-mes"
-                        title={`Duración promedio (min) de disposición`}
-                        data={filteredRellenoData}
-                        xField="cliente"
-                        yField="duracion_min"
-                        yLabel="Duración promedio (min)"
-                    />
-                    </section>
-                )}
-
-                {/* Número de tiradas en el tiempo o por cliente */}
-                {!client && !month && (
-                    <section aria-labelledby="numero-tiradas-mes">
-                    <BarChart
-                        id="numero-tiradas-mes"
-                        title="Número de tiradas por mes"
-                        data={filteredRellenoData}
-                        xField="mes"
-                        yField="tiradas"
-                        yLabel="Número de tiradas"
-                    />
-                    </section>
-                )}
-                {client && !month && (
-                    <section aria-labelledby="numero-tiradas-mes-cliente">
-                    <BarChart
-                        id="numero-tiradas-mes-cliente"
-                        title="Número de tiradas por mes"
-                        data={filteredRellenoData}
-                        xField="mes"
-                        yField="tiradas"
-                        yLabel="Número de tiradas"
-                    />
-                    </section>
-                )}
-                {!client && month && (
-                    <section aria-labelledby="numero-tiradas-cliente-mes">
-                    <BarChart
-                        id="numero-tiradas-cliente-mes"
-                        title={`Número de tiradas`}
-                        data={filteredRellenoData}
-                        xField="cliente"
-                        yField="tiradas"
-                        yLabel="Número de tiradas"
-                    />
-                    </section>
-                )}
-
-                {client && month && (
-                    <>
-                    <section aria-labelledby="ingreso-tipo-residuo">
-                        <BarChart
-                        id="ingreso-tipo-residuo"
-                        title={`Ingreso por tipo de residuo`}
-                        data={filteredRellenoData}
-                        xField="tipo_residuo"
-                        yField="ingreso"
-                        yLabel="Ingreso ($)"
-                        />
-                    </section>
-
-                    <section aria-labelledby="duracion-tipo-residuo">
-                        <BarChart
-                        id="duracion-tipo-residuo"
-                        title={`Duración promedio (min) por tipo de residuo`}
-                        data={filteredRellenoData}
-                        xField="tipo_residuo"
-                        yField="duracion_min"
-                        yLabel="Duración promedio (min)"
-                        />
-                    </section>
-
-                    <section aria-labelledby="tiradas-tipo-residuo">
-                        <BarChart
-                        id="tiradas-tipo-residuo"
-                        title={`Tiradas por tipo de residuo`}
-                        data={filteredRellenoData}
-                        xField="tipo_residuo"
-                        yField="tiradas"
-                        yLabel="Tiradas por tipo de residuo"
-                        />
-                    </section>
-                    </>
-                )}
+                {getChartsFor(filteredRellenoData, client, month)}
                 </div>
 
         </main>
@@ -254,5 +100,103 @@ function RellenoDashboard() {
     </>
   );
 }
+
+
+function computePromedio(data, xField, yField, divisorField) {
+  const grouped = {};
+
+  data.forEach(item => {
+    const key = item[xField];
+    if (!grouped[key]) grouped[key] = { totalY: 0, totalDivisor: 0 };
+    grouped[key].totalY += item[yField];
+    grouped[key].totalDivisor += item[divisorField];
+  });
+
+
+   return Object.entries(grouped).map(([key, { totalY, totalDivisor }]) => ({
+    [xField]: key,
+    "promedio": totalDivisor ? totalY / totalDivisor : 0
+  }));
+
+}
+
+
+function getChartsFor(filteredRellenoData, client, month) {
+  const charts = [];
+
+  const promedio = (groupBy, field) =>
+    computePromedio(filteredRellenoData, groupBy, field, "tiradas");
+
+  const Pie = (id, title, groupBy, field = "kg") => (
+    <section key={id} aria-labelledby={id}>
+      <PieChart
+        id={id}
+        title={title}
+        data={filteredRellenoData}
+        groupBy={groupBy}
+        metricField={field}
+      />
+    </section>
+  );
+
+
+  
+  const Bar = (id, title, xField, yField, yLabel, aggregation = "sum", data = filteredRellenoData) => (
+    <section key={id} aria-labelledby={id}>
+      <BarChart
+        id={id}
+        title={title}
+        data={data}
+        xField={xField}
+        yField={yField}
+        yLabel={yLabel}
+        aggregation={aggregation}
+      />
+    </section>
+  );
+
+  if (!client) {
+    charts.push(Pie("kg-distribucion-cliente", "Distribución de kg por cliente", "cliente"));
+  }
+  charts.push(Pie("kg-distribucion-residuo", "Distribución de kg por tipo de residuo", "tipo_residuo"));
+
+  if (!client && !month) {
+    charts.push(
+      Bar("kg-recibidos-mes", "Kilogramos dispuestos por mes", "mes", "kg", "Kg recibidas"),
+      Bar("kg-promedio-por-tirada", "Kg promedio por entrega", "mes", "promedio", "Kg promedio por entrega", "sum", promedio("mes", "kg")),
+      Bar("duracion-promedio-mes", "Duración promedio (min) de disposición por mes", "mes", "promedio", "Duración promedio (min)", "sum", promedio("mes", "duracion_min")),
+      Bar("numero-tiradas-mes", "Número de tiradas por mes", "mes", "tiradas", "Número de tiradas")
+    );
+  }
+
+  if (client && !month) {
+    charts.push(
+      Bar("kg-recibidos-mes-cliente", "Kilogramos dispuestos por mes", "mes", "kg", "Kg recibidos"),
+      Bar("kg-promedio-por-tirada", "Kg promedio por entrega", "mes", "promedio", "Kg promedio por entrega", "sum", promedio("mes", "kg")),
+      Bar("duracion-promedio-mes-cliente", "Duración promedio (min) de disposición por mes", "mes", "promedio", "Duración promedio (min)", "sum", promedio("mes", "duracion_min")),
+      Bar("numero-tiradas-mes-cliente", "Número de tiradas por mes", "mes", "tiradas", "Número de tiradas")
+    );
+  }
+
+  if (!client && month) {
+    charts.push(
+      Bar("kg-recibidos-cliente-mes", "Kilogramos dispuestos", "cliente", "kg", "Kg recibidos"),
+      Bar("duracion-promedio-cliente-mes", "Duración promedio (min) de disposición", "cliente", "promedio", "Duración promedio (min)", "sum", promedio("cliente", "duracion_min")),
+      Bar("numero-tiradas-cliente-mes", "Número de tiradas", "cliente", "tiradas", "Número de tiradas")
+    );
+  }
+
+  if (client && month) {
+    charts.push(
+      Bar("ingreso-tipo-residuo", "Ingreso por tipo de residuo", "tipo_residuo", "ingreso", "Ingreso ($)"),
+      Bar("duracion-tipo-residuo", "Duración promedio (min) por tipo de residuo", "tipo_residuo", "promedio", "Duración promedio (min)", "sum", promedio("tipo_residuo", "duracion_min")),
+      Bar("tiradas-tipo-residuo", "Tiradas por tipo de residuo", "tipo_residuo", "tiradas", "Tiradas por tipo de residuo")
+    );
+  }
+
+  return charts;
+}
+
+
 
 export { RellenoDashboard };
