@@ -1,16 +1,7 @@
 import { PieChart as RechartsPieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from "recharts";
 import styles from "../Charts.module.css"
+import { COLORS } from "../../../assets/colors";
 
-
-const COLORS = [
-  "#5BC0FF", // blue light
-  "#843ADD", // purple
-  "#5300B8", // blue deep
-  "#2A8AD9", // blue medium
-  "#8840A7", // purple dark
-  "#56A4DD", // blue soft
-  "#3961A8", // blue dark
-];
 
 
 function PieChart({ title, data, groupBy, metricField = "kg", topN = 3 }) {
