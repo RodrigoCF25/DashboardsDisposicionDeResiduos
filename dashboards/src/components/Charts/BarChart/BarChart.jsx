@@ -7,65 +7,65 @@ import {
   Tooltip,
   ResponsiveContainer
 } from "recharts";
-
+import React from "react";
 import styles from "../Charts.module.css"
 import { COLORS } from "../../../assets/colors";
 
-function BarChart({ title, data, xField, yField, aggregation }) {
-  let chartEntries;
+const BarChart = React.memo(
+  function ({ title, data, xField, yField, aggregation }) {
+    let chartEntries;
 
-  if (aggregation !== undefined) {
-    // Agrupación por xField con agregación
-    const groupedData = data.reduce((acc, item) => {
-      const xValue = item[xField];
-      const yValue = item[yField];
+    if (aggregation !== undefined) {
+      // Agrupación por xField con agregación
+      const groupedData = data.reduce((acc, item) => {
+        const xValue = item[xField]
+        const yValue = item[yField]
 
-      if (!acc[xValue]) {
-        acc[xValue] = { sum: 0, count: 0 };
-      }
+        if (!acc[xValue]) {
+          acc[xValue] = { sum: 0, count: 0 }
+        }
 
-      acc[xValue].sum += yValue;
-      acc[xValue].count += 1;
+        acc[xValue].sum += yValue
+        acc[xValue].count += 1
 
-      return acc;
-    }, {});
+        return acc
+      }, {})
 
-    chartEntries = Object.entries(groupedData).map(([name, stats]) => ({
-      name,
-      value: aggregation === "average" ? stats.sum / stats.count : stats.sum,
-    }));
-  } else {
+      chartEntries = Object.entries(groupedData).map(([name, stats]) => ({
+        name,
+        value: aggregation === "average" ? stats.sum / stats.count : stats.sum,
+      }))
+    } else {
 
-    chartEntries = data.map(item => ({
-      name: item[xField],
-      value: item[yField],
-    }));
-  }
+      chartEntries = data.map(item => ({
+        name: item[xField],
+        value: item[yField],
+      }))
+    }
 
-  return (
-    <div className={styles.recharts_wrapper} style={{ height: "360px" }}>
-      <h2 className={styles.title}>{title}</h2>
-      <ResponsiveContainer width="100%" height="100%">
-        <RechartsBarChart data={chartEntries}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis
-            dataKey="name"
-            angle={-45}
-            textAnchor="end"
-            interval={0}
-            height={120}
-          />
-          <YAxis />
-          <Tooltip />
-          <Bar dataKey="value" fill="#5BC0FF" />
-        </RechartsBarChart>
-      </ResponsiveContainer>
-    </div>
-  );
-}
+    return (
+      <div className={styles.recharts_wrapper} style={{ height: "360px" }}>
+        <h2 className={styles.title}>{title}</h2>
+        <ResponsiveContainer width="100%" height="100%">
+          <RechartsBarChart data={chartEntries}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis
+              dataKey="name"
+              angle={-45}
+              textAnchor="end"
+              interval={0}
+              height={120}
+            />
+            <YAxis />
+            <Tooltip />
+            <Bar dataKey="value" fill="#5BC0FF" />
+          </RechartsBarChart>
+        </ResponsiveContainer>
+      </div>
+    );
+})
 
-
-function SimpleBarChart({ title, data, xField, yFields}){
+const SimpleBarChart = React.memo(function({ title, data, xField, yFields}){
 
   return (
     <div className={styles.recharts_wrapper} style={{ height: "360px" }}>
@@ -95,7 +95,7 @@ function SimpleBarChart({ title, data, xField, yFields}){
       </ResponsiveContainer>
     </div>
   );
-}
+})
 
 
 export { BarChart, SimpleBarChart};

@@ -1,26 +1,27 @@
 import { PieChart as RechartsPieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from "recharts";
+import React from "react";
 import styles from "../Charts.module.css"
 import { COLORS } from "../../../assets/colors";
 
 
 
-function PieChart({ title, data, groupBy, metricField = "kg", topN = 3 }) {
+const PieChart = React.memo( function({ title, data, groupBy, metricField = "kg", topN = 3 }) {
   const grouped = data.reduce((acc, item) => {
     const key = item[groupBy];
     const value = item[metricField];
     if (key && typeof value === "number") {
       acc[key] = (acc[key] || 0) + value;
     }
-    return acc;
-  }, {});
+    return acc
+  }, {})
 
   const entries = Object.entries(grouped)
     .map(([name, value]) => ({ name, value }))
-    .sort((a, b) => b.value - a.value);
+    .sort((a, b) => b.value - a.value)
 
-  const top = entries.slice(0, topN);
-  const others = entries.slice(topN);
-  const othersTotal = others.reduce((sum, item) => sum + item.value, 0);
+  const top = entries.slice(0, topN)
+  const others = entries.slice(topN)
+  const othersTotal = others.reduce((sum, item) => sum + item.value, 0)
 
   const finalData = [...top];
   if (othersTotal > 0) {
@@ -51,7 +52,7 @@ function PieChart({ title, data, groupBy, metricField = "kg", topN = 3 }) {
         </ResponsiveContainer>
     </div>
     
-  );
-}
+  )
+})
 
 export {PieChart}

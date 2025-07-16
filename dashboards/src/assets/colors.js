@@ -6,7 +6,7 @@ const COLORS = [
   "#8840A7", // purple dark
   "#56A4DD", // blue soft
   "#3961A8", // blue dark
-];
+]
 
 
 export {COLORS}
