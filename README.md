@@ -8,10 +8,10 @@ Este proyecto presenta un dashboard interactivo construido con React y Vite para
 
 ```bash
 # Clona el repositorio
-git clone <url-del-repositorio>
+git clone https://github.com/RodrigoCF25/DashboardsDisposicionDeResiduos.git
 
 # Entra al directorio del proyecto
-cd ./proyecto/dashboards
+cd ./DashboardsDisposicionDeResiduos/dashboards
 
 # Instala las dependencias
 npm install
@@ -178,3 +178,16 @@ Muestra métricas generales filtradas por mes.
   ```js
   report["utilidadOperativa"] = report.totalIngresoPorDisposicion - (report.totalGastoCombustible + report.totalGastoAditivos);
   ```
+
+
+## Carpeta Create Data
+
+Contiene un código en python para la generación de registros en una base de datos
+
+---
+
+## Carpeta sql
+
+- Contiene el archivo Respaldo.sql para crear la estructura y los datos.
+- Contiene archivos con queries para poder obtener los datos solicitados
+- Contiene archivos Excel con las tablas (resultados) de las consultas de sql
