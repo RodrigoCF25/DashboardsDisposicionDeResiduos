@@ -11,7 +11,7 @@ Este proyecto presenta un dashboard interactivo construido con React y Vite para
 git clone <url-del-repositorio>
 
 # Entra al directorio del proyecto
-cd <nombre-del-proyecto>
+cd ./proyecto/dashboards
 
 # Instala las dependencias
 npm install
@@ -20,7 +20,13 @@ npm install
 npm run dev
 ```
 
-Esto abrirá la aplicación en tu navegador en la dirección [http://localhost:5173](http://localhost:5173), a menos que hayas configurado otro puerto.
+Esto abrirá la aplicación en tu navegador en la dirección [http://localhost:5173], a menos que hayas configurado otro puerto.
+
+## ENDPOINTS A PROBAR
+
+- /relleno-dashboard
+- /recoleccion-dashboard
+- /general-dashboard
 
 ---
 
